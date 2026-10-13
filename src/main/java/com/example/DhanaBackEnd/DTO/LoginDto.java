@@ -9,6 +9,7 @@ public class LoginDto {
     private String name;
     private String role;
     private boolean active;
+    private String token;
 
 
 }

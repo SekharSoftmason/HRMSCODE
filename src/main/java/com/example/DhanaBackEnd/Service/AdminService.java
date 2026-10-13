@@ -37,7 +37,7 @@ public class AdminService {
     private StaffRepo staffrepo;
     @Autowired
     private AttendanceRepo attendancerepo;
-    public ResponseGlobal<Staff> CreateStaff(StaffDto staffdto) {
+    public ResponseGlobal<?> CreateStaff(StaffDto staffdto) {
         if (staffdto.getEmail() == null || staffdto.getEmail().isEmpty()) {
             return ResponseGlobal.onError("The Email is Required");
         }
@@ -60,18 +60,19 @@ public class AdminService {
         staff.setDepartment(staffdto.getDepartment());
         staff.setEmail(staffdto.getEmail());
         staff.setJoiningDate(staffdto.getJoiningDate());
-        return ResponseGlobal.onSuccess("Staff created SuccessFully",staffrepo.save(staff));
+        Staff savestaff=staffrepo.save(staff);
+        return ResponseGlobal.onSuccess("Staff created SuccessFully",savestaff);
 
     }
 
-    public ResponseGlobal<List<Staff>> getAllStaff() {
+    public ResponseGlobal<List<?>> getAllStaff() {
         List<Staff> staff=staffrepo.findAll();
         if (staff.isEmpty()) {
              return ResponseGlobal.onFailure("no staff found");
         }
         return ResponseGlobal.onSuccess("Staff Fetched Successfully",staff);
     }
-    public ResponseGlobal<Staff> getStaffById(long id) {
+    public ResponseGlobal<?> getStaffById(long id) {
         try {
             return ResponseGlobal.onSuccess("Staff Fetched SuccessFully",
                     staffrepo.findById(id).orElseThrow(()->new RuntimeException("staff not Found" +id)));
@@ -83,7 +84,7 @@ public class AdminService {
         }
     }
 
-    public ResponseGlobal<Staff> updateStaff(long id, Staff staff) {
+    public ResponseGlobal<?> updateStaff(long id, Staff staff) {
             Staff existStaff=staffrepo.findById(id).orElseThrow(()->new RuntimeException("staff not Found"));
             existStaff.setPhone(staff.getPhone());
             existStaff.setName(staff.getName());

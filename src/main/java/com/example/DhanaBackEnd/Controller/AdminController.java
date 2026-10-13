@@ -20,23 +20,19 @@ AdminController {
      @Autowired
      private AdminService adminservice;
      @PostMapping("/staff")
-     public ResponseGlobal<Staff> CreateStaff( @RequestBody StaffDto staffdto) {
+     public ResponseGlobal<?> CreateStaff( @RequestBody StaffDto staffdto) {
               return adminservice.CreateStaff(staffdto);
      }
-    @GetMapping("/test-response")
-    public String testResponse() {
-        return "Response is working";
-    }
      @GetMapping("/staff")
-     public ResponseGlobal<List<Staff>> getAllStaff() {
+     public ResponseGlobal<List<?>> getAllStaff() {
              return adminservice.getAllStaff();
      }
      @GetMapping("/staff/{id}")
-    public ResponseGlobal<Staff> getStaffById(@PathVariable long id) {
+    public ResponseGlobal<?> getStaffById(@PathVariable long id) {
         return adminservice.getStaffById(id);
     }
     @PostMapping("/staff/{id}")
-    public ResponseGlobal<Staff> updateStaff(@Valid @PathVariable long id,@RequestBody Staff staff) {
+    public ResponseGlobal<?> updateStaff(@Valid @PathVariable long id,@RequestBody Staff staff) {
         return adminservice.updateStaff(id,staff);
     }
     @DeleteMapping("/staff/{id}")

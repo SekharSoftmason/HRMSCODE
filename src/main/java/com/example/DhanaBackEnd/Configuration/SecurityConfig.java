@@ -1,5 +1,6 @@
 package com.example.DhanaBackEnd.Configuration;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
     @Autowired
     private JWTAuthenticationFilter jwtAuthenticationFilter;
@@ -39,7 +41,7 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs",
                                 "/v3/api-docs/**"
-                        ).permitAll().requestMatchers("/auth/**").permitAll()
+                        ).permitAll().requestMatchers("/auth/login","/auth/create-Admin").permitAll()
                                         .requestMatchers("/admin/**").hasRole("ADMIN")
                                         .requestMatchers("/staff/**").hasRole("STAFF")
                                         .anyRequest().authenticated()

@@ -2,8 +2,13 @@ package com.example.DhanaBackEnd.Configuration;
 
 import com.example.DhanaBackEnd.DTO.StaffDto;
 import com.example.DhanaBackEnd.Model.Staff;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 public class ResponseGlobal<T> {
     private String message;

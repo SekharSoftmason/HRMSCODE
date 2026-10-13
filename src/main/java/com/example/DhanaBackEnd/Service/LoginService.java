@@ -11,20 +11,22 @@ import com.example.DhanaBackEnd.RoleEnum.RoleEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class LoginService {
-    private static final Logger log= LoggerFactory.getLogger(LoginService.class);
+    private static final Logger log = LoggerFactory.getLogger(LoginService.class);
     @Autowired
     private LoginRepo loginrepo;
     @Autowired
     private JWTService jwtService;
     @Autowired
     private SecurityConfig securityConfig;
-
-
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public ResponseGlobal<?> createAdmin(String email, String password, String name, String secretKey) {
         if (secretKey == null || secretKey.isEmpty()) {
@@ -40,38 +42,35 @@ public class LoginService {
         admin.setPassword(password);
         admin.setRole(String.valueOf(RoleEnum.ADMIN));
         admin.setActive(true);
+        Login savedAdmin =loginrepo.save(admin);
         LoginDto response = new LoginDto();
 
-        response.setEmail(admin.getEmail());
-        response.setName(admin.getName());
-        response.setRole(admin.getRole());
-        response.setActive(admin.isActive());
-        response.setPassword(admin.getPassword());
-        loginrepo.save(admin);
+        response.setEmail(savedAdmin.getEmail());
+        response.setName(savedAdmin.getName());
+        response.setRole(savedAdmin.getRole());
+        response.setActive(savedAdmin.isActive());
         return ResponseGlobal.onSuccess(
-                "Admin created successfully", admin
+                "Admin created successfully", response
         );
     }
+    public ResponseGlobal<?> login(String email, String password) {
 
-    public ResponseGlobal<?> login(String email, String password, String role) {
-        if (email == null || password == null) {
-            return ResponseGlobal.onError("Email and  password must not be null");
+        if (email == null || email.isBlank()
+                || password == null || password.isBlank()) {
+            return  ResponseGlobal.onError("Email and password are required");
         }
-        Login UserExistOrNot = loginrepo.findByEmail(email);
-        if (UserExistOrNot == null) {
-            return ResponseGlobal.onFailure("Invalid password for email " + email);
+        Login user = loginrepo.findByEmail(email.trim().toLowerCase());
+        if (user == null) {
+            return  ResponseGlobal.onFailure("User not found");
         }
-        Login CheckPassword = loginrepo.findByEmailAndPassword(email, password);
-        if (CheckPassword == null) {
-            return ResponseGlobal.onFailure("Invalid password for email " + password);
+        if (!passwordEncoder.matches(
+                password, user.getPassword())) {
+            return ResponseGlobal.onFailure("Invalid password");
         }
-        if (role != null && !role.isBlank()) {
-            return ResponseGlobal.onFailure("Invalid role");
+        String token = jwtService.generateToken(user.getEmail(), user.getName(), user.getRole());
 
-        }
-        String jwt = jwtService.generateToken(email, UserExistOrNot.getName(), role);
-        return ResponseGlobal.onSuccess("Login Successful", jwt);
+        return ResponseGlobal.onSuccess("Login successful",token
+        );
     }
-
 }
 
