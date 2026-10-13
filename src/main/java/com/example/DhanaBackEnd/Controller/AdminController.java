@@ -20,9 +20,13 @@ AdminController {
      @Autowired
      private AdminService adminservice;
      @PostMapping("/staff")
-     public ResponseGlobal<?> CreateStaff( @RequestBody StaffDto staffdto) {
+     public ResponseGlobal<Staff> CreateStaff( @RequestBody StaffDto staffdto) {
               return adminservice.CreateStaff(staffdto);
      }
+    @GetMapping("/test-response")
+    public String testResponse() {
+        return "Response is working";
+    }
      @GetMapping("/staff")
      public ResponseGlobal<List<Staff>> getAllStaff() {
              return adminservice.getAllStaff();

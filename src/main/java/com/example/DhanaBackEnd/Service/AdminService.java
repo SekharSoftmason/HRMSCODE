@@ -37,7 +37,7 @@ public class AdminService {
     private StaffRepo staffrepo;
     @Autowired
     private AttendanceRepo attendancerepo;
-    public ResponseGlobal<?> CreateStaff(StaffDto staffdto) {
+    public ResponseGlobal<Staff> CreateStaff(StaffDto staffdto) {
         if (staffdto.getEmail() == null || staffdto.getEmail().isEmpty()) {
             return ResponseGlobal.onError("The Email is Required");
         }

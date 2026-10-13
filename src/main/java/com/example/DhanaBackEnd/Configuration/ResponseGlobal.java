@@ -6,30 +6,28 @@ import lombok.Data;
 
 @Data
 public class ResponseGlobal<T> {
-    private String Message;
-    private boolean Success;
+    private String message;
+    private boolean success;
     private T data;
-    public static <T> ResponseGlobal<T> onSuccess(String Message, T data) {
-            ResponseGlobal<T> response=new ResponseGlobal<>();
-            response.setMessage(Message);
-            response.setSuccess(true);
-            response.setData(data);
-            return response;
-
+    public static <T> ResponseGlobal<T> onSuccess(String message, T data){
+        ResponseGlobal<T> response=new ResponseGlobal<>();
+        response.setMessage(message);
+        response.setSuccess(true);
+        response.setData(data);
+        return response;
     }
-     public static <T> ResponseGlobal<T> onFailure(String Message) {
+    public static <T> ResponseGlobal<T> onFailure(String message){
         ResponseGlobal<T> failure=new ResponseGlobal<>();
-        failure.setMessage(Message);
+        failure.setMessage(message);
         failure.setSuccess(false);
         return failure;
-
     }
-    public static <T> ResponseGlobal<T> onError(String Message) {
+    public static <T> ResponseGlobal<T> onError(String message){
         ResponseGlobal<T> error=new ResponseGlobal<>();
-        error.setMessage(Message);
+        error.setMessage(message);
         error.setSuccess(false);
         return error;
-
     }
-
 }
+
+

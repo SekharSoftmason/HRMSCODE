@@ -22,40 +22,36 @@ import java.util.List;
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private JWTService jwtService;
-    @Override
-    protected boolean
-    shouldNotFilter(HttpServletRequest request) {
-
-        String path = request.getServletPath();
-
-        return path.startsWith("/swagger-ui")
-                || path.startsWith("/v3/api-docs");
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
+
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
+
             if (jwtService.validatetoken(token)) {
                 String email = jwtService.getEmailFromToken(token);
                 String role = jwtService.getRoleFromToken(token);
+
                 if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     List<SimpleGrantedAuthority> authorities = Collections.emptyList();
                     if (role != null && !role.isBlank()) {
                         String roleName = role.startsWith("ROLE_") ? role : "ROLE_" + role;
-                        authorities=List.of(new SimpleGrantedAuthority(roleName));
+                        authorities = List.of(new SimpleGrantedAuthority(roleName));
                     }
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, null, authorities);
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+
+                    UsernamePasswordAuthenticationToken authenticationToken =
+                            new UsernamePasswordAuthenticationToken(email, null, authorities);
+
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
             }
 
-
+            filterChain.doFilter(request, response);
         }
-        filterChain.doFilter(request, response);
     }
 }

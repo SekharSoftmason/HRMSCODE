@@ -34,24 +34,18 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests
                         (auth ->
-                                auth.requestMatchers("/swagger-ui/**" ,"/auth/**","/admin/**").permitAll()
+                                auth.requestMatchers(
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs",
+                                "/v3/api-docs/**"
+                        ).permitAll().requestMatchers("/auth/**").permitAll()
+                                        .requestMatchers("/admin/**").hasRole("ADMIN")
                                         .requestMatchers("/staff/**").hasRole("STAFF")
-                                        .anyRequest().authenticated())
+                                        .anyRequest().authenticated()
+                        )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
 
-    }
-    @Bean
-    public UserDetailsService userDetailsService(PasswordEncoder encoder) {
-        UserDetails userDetails= User.withUsername("admin")
-                .password(encoder.encode("1234"))
-                .roles("ADMIN")
-                        .
-                build();
-        return new InMemoryUserDetailsManager(userDetails);
-    }
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
     }
 }
