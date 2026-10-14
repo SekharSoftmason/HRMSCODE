@@ -32,7 +32,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+        http.csrf(csrf ->csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests
                         (auth ->
@@ -40,14 +40,28 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs",
-                                "/v3/api-docs/**"
-                        ).permitAll().requestMatchers("/auth/login","/auth/create-Admin").permitAll()
+                                "/v3/api-docs/**","/h2-console/**"
+                        ).permitAll().requestMatchers("/auth/**").permitAll()
                                         .requestMatchers("/admin/**").hasRole("ADMIN")
                                         .requestMatchers("/staff/**").hasRole("STAFF")
-                                        .anyRequest().authenticated()
+                                        .anyRequest().authenticated()).headers(headers -> headers
+                                                .frameOptions(frame -> frame.disable())
                         )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
 
+    }
+    @Bean
+    public UserDetailsService userDetailsService(PasswordEncoder encoder) {
+        UserDetails userDetails= User.withUsername("admin")
+                .password(encoder.encode("1234"))
+                .roles("ADMIN")
+                        .
+                build();
+        return new InMemoryUserDetailsManager(userDetails);
+    }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
     }
 }

@@ -1,7 +1,11 @@
 package com.example.DhanaBackEnd.Controller;
 
 import com.example.DhanaBackEnd.Configuration.ResponseGlobal;
+import com.example.DhanaBackEnd.DTO.AdminDto;
+import com.example.DhanaBackEnd.DTO.LoginDto;
+import com.example.DhanaBackEnd.DTO.LoginRequestDto;
 import com.example.DhanaBackEnd.Service.LoginService;
+import jakarta.persistence.ManyToOne;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,12 +16,12 @@ public class LoginController {
     private LoginService loginService;
 
     @PostMapping("/create-Admin")
-    public ResponseGlobal<?> createAdmin(@RequestParam String email, @RequestParam String password, @RequestParam String name, @RequestParam String secretKey) {
-        return loginService.createAdmin(email, password, name, secretKey);
+    public ResponseGlobal<AdminDto> createAdmin(@ModelAttribute AdminDto adminDto) {
+        return loginService.createAdmin(adminDto);
     }
 
     @PostMapping("/login")
-    public ResponseGlobal<?> login(@RequestParam String email, @RequestParam String password) {
-        return loginService.login(email, password);
+    public ResponseGlobal<?> login(@ModelAttribute LoginDto dto) {
+        return loginService.login(dto);
     }
 }

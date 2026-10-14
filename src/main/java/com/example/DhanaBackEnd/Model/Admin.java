@@ -9,7 +9,7 @@ public class Admin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(unique = true,nullable = false)
+    @Column(name="Email",unique = true,nullable = false)
     private String email;
     @Column(unique=false)
     private String name;
