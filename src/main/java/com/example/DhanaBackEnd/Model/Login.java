@@ -27,11 +27,4 @@ public class Login {
     @Column(name = "active", nullable = false)
     private boolean active;
 
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
 }
