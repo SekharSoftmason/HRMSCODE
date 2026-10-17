@@ -6,8 +6,8 @@ import lombok.Data;
 public class LoginDto {
     private String password;
     private  String email;
-    private String name;
-    private String role;
-    private boolean active;
+   // private String name;
+   // private String role;
+    //private boolean active;
 
 }

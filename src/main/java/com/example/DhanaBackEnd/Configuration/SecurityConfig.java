@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.Customizer;
@@ -42,6 +43,10 @@ public class SecurityConfig {
                                 "/v3/api-docs",
                                 "/v3/api-docs/**","/h2-console/**"
                         ).permitAll().requestMatchers("/auth/**").permitAll()
+                                        .requestMatchers("/holiday/**")
+                                        .hasRole("ADMIN")
+                                        .requestMatchers("/event/**").permitAll()
+                                        .requestMatchers("/notice/**").permitAll()
                                         .requestMatchers("/admin/**").hasRole("ADMIN")
                                         .requestMatchers("/staff/**").hasRole("STAFF")
                                         .anyRequest().authenticated()).headers(headers -> headers

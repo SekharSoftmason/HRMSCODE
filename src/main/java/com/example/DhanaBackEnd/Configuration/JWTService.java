@@ -39,7 +39,7 @@ public class JWTService {
 
     public Claims getClaims(String token) {
         String cleanToken = token.startsWith("Bearer ") ? token.substring(7) : token;
-        return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJwt(cleanToken)
+        return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(cleanToken)
                 .getBody();
     }
 
@@ -53,7 +53,8 @@ public class JWTService {
     }
 
     public String getRoleFromToken(String token) {
-        return getClaims(token).get("role", String.class);
+        return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token).getBody()
+        .get("role", String.class);
     }
 
     public boolean validatetoken(String token) {

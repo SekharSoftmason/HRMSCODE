@@ -43,6 +43,14 @@ public class StaffService {
           if  (staff == null) {
               return ResponseGlobal.onFailure("Staff not found");
           }
+          Attendance attendance1=attendancerepo.findByStaff(staff);
+          if (attendance1==null) {
+              Attendance newattendance=new Attendance();
+              newattendance.setStaff(staff);
+              newattendance.setAttendanceDate( LocalDate.now());
+              newattendance.setCheckIn(LocalDateTime.now());
+              attendancerepo.save(newattendance);
+          }
           LocalDate today= LocalDate.now();
           boolean alreadyCheckIn= attendancerepo.existsByStaffIdAndAttendanceDate(staff.getId(),today);
           if (alreadyCheckIn) {

@@ -2,10 +2,12 @@ package com.example.DhanaBackEnd.Service;
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
+import com.example.DhanaBackEnd.Configuration.JWTService;
 import com.example.DhanaBackEnd.Configuration.ResponseGlobal;
 import com.example.DhanaBackEnd.Configuration.SecurityConfig;
 import com.example.DhanaBackEnd.DTO.DashboardDto;
 import com.example.DhanaBackEnd.DTO.StaffDto;
+import com.example.DhanaBackEnd.DTO.UpdateStaffDto;
 import com.example.DhanaBackEnd.Model.Attendance;
 import com.example.DhanaBackEnd.Model.Dashboard;
 import com.example.DhanaBackEnd.Model.Login;
@@ -25,6 +27,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.example.DhanaBackEnd.RoleEnum.RoleEnum.staff;
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 
 @Service
@@ -37,9 +40,16 @@ public class AdminService {
     private StaffRepo staffrepo;
     @Autowired
     private AttendanceRepo attendancerepo;
+    @Autowired
+    private JWTService jwtService;
     public ResponseGlobal<?> CreateStaff(StaffDto staffdto) {
         if (staffdto.getEmail() == null || staffdto.getEmail().isEmpty()) {
             return ResponseGlobal.onError("The Email is Required");
+        }
+        if (loginrepo.existsByEmail(staffdto.getEmail())) {
+            return ResponseGlobal.onFailure(
+                    "This email already exists in login"
+            );
         }
         Staff existStaff = staffrepo.findByEmail(staffdto.getEmail());
         if (existStaff != null) {
@@ -65,7 +75,8 @@ public class AdminService {
 
     }
 
-    public ResponseGlobal<List<?>> getAllStaff() {
+    public ResponseGlobal<List<?>> getAllStaff(String token) {
+        String getEmailfromToken=jwtService.getEmailFromToken(token);
         List<Staff> staff=staffrepo.findAll();
         if (staff.isEmpty()) {
              return ResponseGlobal.onFailure("no staff found");
@@ -84,14 +95,14 @@ public class AdminService {
         }
     }
 
-    public ResponseGlobal<?> updateStaff(long id, Staff staff) {
+    public ResponseGlobal<?> updateStaff(long id, UpdateStaffDto request , String token) {
+          String getEmailfromToken=jwtService.getEmailFromToken(token);
             Staff existStaff=staffrepo.findById(id).orElseThrow(()->new RuntimeException("staff not Found"));
-            existStaff.setPhone(staff.getPhone());
-            existStaff.setName(staff.getName());
-            existStaff.setDesignation(staff.getDesignation());
-            existStaff.setDepartment(staff.getDepartment());
-            existStaff.setEmail(staff.getEmail());
-            existStaff.setJoiningDate(staff.getJoiningDate());
+        existStaff.setPhone(request.getPhone());
+        existStaff.setName(request.getName());
+        existStaff.setDesignation(request.getDesignation());
+        existStaff.setDepartment(request.getDepartment());
+        existStaff.setEmail(request.getEmail());
             return ResponseGlobal.onSuccess("Staff updated SuccessFully", staffrepo.save(existStaff));
 
     }
@@ -104,7 +115,8 @@ public class AdminService {
     return "Student with id " + id + " has been deleted successfully.";
     }
 
-    public ResponseGlobal<?> getAllAttendance() {
+    public ResponseGlobal<?> getAllAttendance(String token) {
+        String getEmailfromToken=jwtService.getEmailFromToken(token);
         List<Attendance> attendance=attendancerepo.findAll();
         if (attendancerepo==null) {
             return ResponseGlobal.onFailure("no staff found");
@@ -122,7 +134,8 @@ public class AdminService {
           return ResponseGlobal.onSuccess("staff attendance fetched successfully",attendanceList);
 
     }
-    public ResponseGlobal<?> getDashboard() {
+    public ResponseGlobal<?> getDashboard(String token) {
+        String getEmailfromToken=jwtService.getEmailFromToken(token);
             long totalStaff= staffrepo.count();
             long activeStaff=loginrepo.countByRoleAndActive("STAFF",true);
             List<Attendance> todayAttendance=attendancerepo.findByAttendanceDate(LocalDate.now());
